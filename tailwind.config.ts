@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      letterSpacing: {
+        ultra: '0.2em',
+      },
       colors: {
         gold: {
           DEFAULT: '#C8A96E',

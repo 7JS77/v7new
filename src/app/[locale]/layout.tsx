@@ -12,6 +12,9 @@ import CookieConsent from '@/components/CookieConsent';
 import Footer from '@/components/Footer';
 import '@/app/globals.css';
 
+// FORCE DYNAMIC RENDERING - Fixes the next-intl header error
+export const dynamic = 'force-dynamic';
+
 // Logo base64 - loaded server-side
 import { readFileSync } from 'fs';
 import { join } from 'path';

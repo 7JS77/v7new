@@ -63,10 +63,6 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   };
 }
 
-export function generateStaticParams() {
-  return [{ locale: 'de' }, { locale: 'en' }, { locale: 'es' }];
-}
-
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
   const { locale } = params;
   if (!isValidLocale(locale)) notFound();

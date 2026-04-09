@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('title'),
     description: t('description'),
-    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://aurexon.at'),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://aurexon.at'),
     openGraph: {
       title: t('title'),
       description: t('description'),

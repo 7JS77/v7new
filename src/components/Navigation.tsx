@@ -4,9 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { locales, localeNames, localeFlags, type Locale } from '@/lib/i18n';
 
-
+// FIX: We define these directly here so we don't accidentally import server-side code into the browser!
+type Locale = 'de' | 'en' | 'es';
+const locales: Locale[] = ['de', 'en', 'es'];
+const localeNames: Record<Locale, string> = { de: 'Deutsch', en: 'English', es: 'Español' };
+const localeFlags: Record<Locale, string> = { de: '🇦🇹', en: '🇬🇧', es: '🇪🇸' };
 
 interface NavLink {
   href: string;
@@ -85,13 +88,17 @@ export default function Navigation({ locale, logoB64 }: NavigationProps) {
       >
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center gap-3 flex-shrink-0" aria-label="Aurexon GmbH – Home">
-          <img
-            src={`data:image/jpeg;base64,${logoB64}`}
-            alt="Aurexon GmbH Logo"
-            width={28}
-            height={25}
-            className="object-contain"
-          />
+          {logoB64 ? (
+            <img
+              src={`data:image/jpeg;base64,${logoB64}`}
+              alt="Aurexon GmbH Logo"
+              width={28}
+              height={25}
+              className="object-contain"
+            />
+          ) : (
+            <div className="w-7 h-7 bg-gold/20 border border-gold flex items-center justify-center text-xs text-gold">A</div>
+          )}
           <span className="font-display text-xl font-medium tracking-wide leading-none">
             Aurexon <strong className="text-gold font-medium">GmbH</strong>
           </span>

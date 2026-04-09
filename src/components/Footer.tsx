@@ -19,7 +19,17 @@ export default function Footer({ locale, logoB64 }: FooterProps) {
           {/* Brand */}
           <div>
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-4">
-              <img src={`data:image/jpeg;base64,${logoB64}`} alt="Aurexon GmbH Logo" width={26} height={23} className="object-contain"/>
+              {logoB64 ? (
+                <img 
+                  src={`data:image/jpeg;base64,${logoB64}`} 
+                  alt="Aurexon GmbH Logo" 
+                  width={26} 
+                  height={23} 
+                  className="object-contain"
+                />
+              ) : (
+                <div className="w-6 h-6 bg-gold/20 border border-gold flex items-center justify-center text-[10px] text-gold">A</div>
+              )}
               <span className="font-display text-xl font-medium tracking-wide leading-none">
                 Aurexon <strong className="text-gold font-medium">GmbH</strong>
               </span>

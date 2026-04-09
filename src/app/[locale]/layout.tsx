@@ -12,7 +12,7 @@ import CookieConsent from '@/components/CookieConsent';
 import Footer from '@/components/Footer';
 import '@/app/globals.css';
 
-// FORCE DYNAMIC RENDERING - Fixes the next-intl header error
+// Force dynamic rendering to bypass static generation header issues
 export const dynamic = 'force-dynamic';
 
 // Logo base64 - loaded server-side
@@ -24,7 +24,6 @@ function getLogoB64(): string {
     const logoPath = join(process.cwd(), 'public', 'logo.jpg');
     return readFileSync(logoPath).toString('base64');
   } catch {
-    // Return placeholder if logo not found
     return '';
   }
 }
@@ -70,11 +69,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const { locale } = params;
   if (!isValidLocale(locale)) notFound();
 
-  const messages = await getMessages({ locale });
+  // FIX 1: getMessages must be called with NO arguments
+  const messages = await getMessages();
   const logoB64 = getLogoB64();
 
   return (
-    <html lang={locale === 'de' ? 'de-AT' : locale} className="scroll-smooth">
+    // FIX 2: suppressHydrationWarning stops browser extensions from crashing your app!
+    <html lang={locale === 'de' ? 'de-AT' : locale} className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com"/>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
@@ -82,57 +83,21 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap"
           rel="stylesheet"
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "Aurexon GmbH",
-              "url": "https://aurexon.at",
-              "description": "Physischer Rohstoffhandel auf eigene Rechnung. Handel mit Waren aller Art. Wien, Österreich.",
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Wien",
-                "addressCountry": "AT",
-                "postalCode": "1010"
-              },
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+43-1-000-0000",
-                "contactType": "customer service",
-                "email": "office@aurexon.at",
-                "availableLanguage": ["German", "English", "Spanish"]
-              },
-              "areaServed": "Worldwide",
-              "knowsAbout": ["Commodity Trading", "Physical Commodities", "Metals", "Energy", "Agricultural Products"]
-            })
-          }}
-        />
       </head>
-      <body className="bg-ink text-text-primary">
+      <body className="bg-ink text-text-primary" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <CookieProvider>
             <ToastProvider>
               {/* Skip link */}
-              <a
-                href="#main-content"
-                className="skip-link"
-              >
+              <a href="#main-content" className="skip-link">
                 {locale === 'de' ? 'Zum Hauptinhalt springen' : locale === 'es' ? 'Saltar al contenido' : 'Skip to main content'}
               </a>
 
-              {/* Fixed layers */}
               <LegalBanner />
               <Navigation locale={locale as Locale} logoB64={logoB64} />
               <PriceTicker />
 
-              {/* Main content with top padding for fixed bars */}
-              <main
-                id="main-content"
-                className="pt-[138px]"
-                tabIndex={-1}
-              >
+              <main id="main-content" className="pt-[138px]" tabIndex={-1}>
                 {children}
               </main>
 

@@ -12,7 +12,6 @@ import CookieConsent from '@/components/CookieConsent';
 import Footer from '@/components/Footer';
 import '@/app/globals.css';
 
-// Force dynamic rendering to bypass static generation header issues
 export const dynamic = 'force-dynamic';
 
 // Logo base64 - loaded server-side
@@ -26,11 +25,6 @@ function getLogoB64(): string {
   } catch {
     return '';
   }
-}
-
-interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: { locale: string };
 }
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
@@ -48,12 +42,6 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       locale: locale === 'de' ? 'de_AT' : locale,
       siteName: 'Aurexon GmbH',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: t('title'),
-      description: t('description'),
-    },
-    robots: { index: true, follow: true },
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -65,30 +53,21 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   };
 }
 
-export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
+export default async function LocaleLayout({ children, params }: { children: React.ReactNode, params: { locale: string } }) {
   const { locale } = params;
   if (!isValidLocale(locale)) notFound();
 
-  // FIX 1: getMessages must be called with NO arguments
   const messages = await getMessages();
   const logoB64 = getLogoB64();
 
+  // FIX: The manual <head> tag has been completely removed to prevent Duplicate DOM elements.
+  // Next.js handles metadata automatically, and your fonts are already safely loaded via globals.css!
   return (
-    // FIX 2: suppressHydrationWarning stops browser extensions from crashing your app!
     <html lang={locale === 'de' ? 'de-AT' : locale} className="scroll-smooth" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="bg-ink text-text-primary" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <CookieProvider>
             <ToastProvider>
-              {/* Skip link */}
               <a href="#main-content" className="skip-link">
                 {locale === 'de' ? 'Zum Hauptinhalt springen' : locale === 'es' ? 'Saltar al contenido' : 'Skip to main content'}
               </a>

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
-// FIX: We define these directly here so we don't accidentally import server-side code into the browser!
 type Locale = 'de' | 'en' | 'es';
 const locales: Locale[] = ['de', 'en', 'es'];
 const localeNames: Record<Locale, string> = { de: 'Deutsch', en: 'English', es: 'Español' };
@@ -62,6 +61,13 @@ export default function Navigation({ locale, logoB64 }: NavigationProps) {
 
   function switchLocale(newLocale: Locale) {
     setLangOpen(false);
+    
+    // SAFETY GUARD: If pathname is missing, just route to the root of the new language
+    if (!pathname) {
+      router.push(`/${newLocale}`);
+      return;
+    }
+
     const segments = pathname.split('/');
     segments[1] = newLocale;
     const newPath = segments.join('/');
@@ -70,6 +76,9 @@ export default function Navigation({ locale, logoB64 }: NavigationProps) {
   }
 
   function isActive(href: string) {
+    // SAFETY GUARD: Don't check active state if pathname hasn't loaded yet
+    if (!pathname) return false;
+
     const localePath = `/${locale}${href === '/' ? '' : href}`;
     return href === '/'
       ? pathname === `/${locale}` || pathname === `/${locale}/`
@@ -184,9 +193,9 @@ export default function Navigation({ locale, logoB64 }: NavigationProps) {
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
           >
-            <span className={`block w-5.5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block w-5.5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5.5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? 'opacity-0' : ''}`} />
+            <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-300 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
           </button>
         </div>
       </nav>
